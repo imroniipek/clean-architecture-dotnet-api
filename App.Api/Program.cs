@@ -1,10 +1,13 @@
 using App.Api.ExceptionHandler;
 using App.Api.Filters;
+using App.Repository.Cache;
 using App.Repository.Context;
 using App.Repository.Interceptors;
 using App.Repository.Repo.Abstract;
+using App.Repository.Repo.CategoryRepo;
 using App.Repository.Repo.ProductRepository;
 using App.Repository.UnitOfWork;
+using App.Services.Category;
 using App.Services.Product;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,8 +29,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddAuthorization();
-
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<ICacheService, AppCaching>();
 builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
