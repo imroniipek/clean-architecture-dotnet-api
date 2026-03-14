@@ -1,13 +1,8 @@
-﻿# Build outputs
-bin/
+﻿bin/
 obj/
-
-# Rider / JetBrains
-.idea/
-
-# Visual Studio
 .vs/
-
-# User specific files
+.idea/
 *.user
 *.suo
+*.cache
+*.log
