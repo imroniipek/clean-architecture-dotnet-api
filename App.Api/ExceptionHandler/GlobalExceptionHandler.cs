@@ -1,6 +1,5 @@
 ﻿using App.Services.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
-
 namespace App.Api.ExceptionHandler;
 
 public class GlobalExceptionHandler:IExceptionHandler

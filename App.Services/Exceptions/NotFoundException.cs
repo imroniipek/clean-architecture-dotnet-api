@@ -2,7 +2,5 @@
 
 namespace App.Services.Exceptions;
 
-public class NotFoundException : AppException
-{
-    public NotFoundException(string message) : base(HttpStatusCode.NotFound,message){}
-}
+public class NotFoundException(string entityName, object id) : AppException(HttpStatusCode.NotFound,
+    $"{id}'li {entityName}Bulunamadı");

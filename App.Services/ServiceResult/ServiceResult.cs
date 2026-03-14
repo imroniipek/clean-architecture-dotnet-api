@@ -5,13 +5,13 @@ public class ServiceResult<T>
 {
     public T? Data { get; private set; }
 
-    public IEnumerable<string> ErrorMessages { get; private set; } = Enumerable.Empty<string>();
+    public IEnumerable<string> ErrorMessages { get; private init; } = Enumerable.Empty<string>();
 
     public HttpStatusCode StatusCode { get; private set; }
 
     public string? Url { get; private set; }
 
-    public bool IsSuccess => !ErrorMessages.Any();
+    private bool IsSuccess => !ErrorMessages.Any();
 
     public bool IsFailed => !IsSuccess;
 

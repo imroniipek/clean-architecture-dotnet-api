@@ -15,7 +15,6 @@ public class ProductController(IProductService service):CustomBaseController
     public async Task<IActionResult> GetAll() => CreateActionResult(await service.GetAllOfProductAsync());
     
     
-    [ServiceFilter(typeof(NotFoundFilter<Product,int>))]
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
         => CreateActionResult(await service.GetProductByIdAsync(id));
@@ -34,12 +33,11 @@ public class ProductController(IProductService service):CustomBaseController
     }
     //route constraint//
     
-    [ServiceFilter(typeof(NotFoundFilter<Product,int>))]
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, ProductUpdateRequest request)
         => CreateActionResult(await service.UpdateProductAsync(id, request));
     
-    [ServiceFilter(typeof(NotFoundFilter<Product,int>))]
+   
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id) => CreateActionResult(await service.DeleteProductAsync(id));
 }

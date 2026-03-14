@@ -1,4 +1,17 @@
-﻿using App.Repository.Entities;
+﻿/*
+        * DbContextEventData ise, o bariyerden geçen aracın (yani senin veritabanı işleminin) içindeki her şeyi içeren "dosyadır".
+        * * Bu dosyanın içinde sadece "context" yok, işlemin teknik künyesine dair birçok bilgi var.
+        * Anlamana yardımcı olması için DbContextEventData içindeki en önemli parçaları bir tabloyla özetleyeyim:
+        *
+        *Parametre             Ne Anlama Gelir?                                Ne İçin Kullanırsın?
+        .Context              O an çalışan DbContext nesnesidir.              Değişen verileri (Entity) yakalamak, ChangeTracker'a bakmak için.
+        .EventId              EF Core'un bu işleme verdiği benzersiz kimlik.  Loglama yaparken işlemleri birbirinden ayırmak için.
+       .LogLevel              Bu olayın ciddiyet seviyesi (Info, Warning vb.).    Sadece kritik durumlarda kod çalıştırmak için.
+       .IsAsync               İşlemin async mi yoksa sync mi olduğu.          Kodun asenkron akışa uygun olup olmadığını kontrol etmek için.
+       .StartTime             İşlemin başladığı an.                           Performans ölçümü yapmak için
+
+        */
+using App.Repository.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
@@ -10,49 +23,48 @@ public class AuditDbContextInterceptor : SaveChangesInterceptor
     {
         [EntityState.Added] = AddBehavior,
         [EntityState.Modified] = UpdateBehavior
-    };  
+    };
 
-    public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
+    public override InterceptionResult<int> SavingChanges(
+        DbContextEventData eventData,
+        InterceptionResult<int> result)
     {
-        /*
-         * DbContextEventData ise, o bariyerden geçen aracın (yani senin veritabanı işleminin) içindeki her şeyi içeren "dosyadır".
-         * * Bu dosyanın içinde sadece "context" yok, işlemin teknik künyesine dair birçok bilgi var.
-         * Anlamana yardımcı olması için DbContextEventData içindeki en önemli parçaları bir tabloyla özetleyeyim: 
-         *
-         *Parametre             Ne Anlama Gelir?                                Ne İçin Kullanırsın?
-         .Context              O an çalışan DbContext nesnesidir.              Değişen verileri (Entity) yakalamak, ChangeTracker'a bakmak için.
-         .EventId              EF Core'un bu işleme verdiği benzersiz kimlik.  Loglama yaparken işlemleri birbirinden ayırmak için.
-        .LogLevel              Bu olayın ciddiyet seviyesi (Info, Warning vb.).    Sadece kritik durumlarda kod çalıştırmak için.
-        .IsAsync               İşlemin async mi yoksa sync mi olduğu.          Kodun asenkron akışa uygun olup olmadığını kontrol etmek için.
-        .StartTime             İşlemin başladığı an.                           Performans ölçümü yapmak için
-        
-         */
-
-        var context = eventData.Context;
-        if (context == null) return base.SavingChanges(eventData, result);
-
-        foreach (var item in context.ChangeTracker.Entries())
-        {
-            if (item.Entity is IAudiEntity audiEntity && Behaviors.ContainsKey(item.State))
-            {
-                Behaviors[item.State](context, audiEntity);
-            }
-        }
-
+        ApplyAudit(eventData.Context);
         return base.SavingChanges(eventData, result);
     }
 
-    public static void AddBehavior(DbContext context, IAudiEntity audiEntity)
+    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
+        DbContextEventData eventData,
+        InterceptionResult<int> result,
+        CancellationToken cancellationToken = default)
     {
-        audiEntity.CreatedAt = DateTime.Now;
-        context.Entry(audiEntity).Property(x => x.UpdatedAt).IsModified = false;
-        Console.WriteLine($"Createden Önceki değerimiz: {context.Entry(audiEntity).Property(x => x.CreatedAt).CurrentValue}");
+        ApplyAudit(eventData.Context);
+        return base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 
-    public static void UpdateBehavior(DbContext context, IAudiEntity audiEntity)
+    private static void ApplyAudit(DbContext? context)
     {
-        audiEntity.UpdatedAt = DateTime.Now;
+        if (context == null) return;
+
+        foreach (var entry in context.ChangeTracker.Entries())
+        {
+            if (entry.Entity is IAudiEntity audiEntity &&
+                Behaviors.TryGetValue(entry.State, out var behavior))
+            {
+                behavior(context, audiEntity);
+            }
+        }
+    }
+
+    private static void AddBehavior(DbContext context, IAudiEntity audiEntity)
+    {
+        audiEntity.CreatedAt = DateTime.UtcNow;
+        context.Entry(audiEntity).Property(x => x.UpdatedAt).IsModified = false;
+    }
+
+    private static void UpdateBehavior(DbContext context, IAudiEntity audiEntity)
+    {
+        audiEntity.UpdatedAt = DateTime.UtcNow;
         context.Entry(audiEntity).Property(x => x.CreatedAt).IsModified = false;
-        Console.WriteLine($"Updateden Önceki değerimiz: {context.Entry(audiEntity).Property(x => x.UpdatedAt).CurrentValue}");
     }
 }

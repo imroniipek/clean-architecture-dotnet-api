@@ -1,16 +1,11 @@
 ﻿using App.Repository.Entities;
 using Microsoft.EntityFrameworkCore;
-
 namespace App.Repository.Context;
 
-public class AppDbContext : DbContext
+public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-    {
-    }
-
-    public DbSet<Product> Products { get; set; } = default!;
-    public DbSet<Category> Categories { get; set; } = default!;
+    public DbSet<Product> Products { get; set; } = null!;
+    public DbSet<Category> Categories { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -50,7 +50,7 @@ public class CategoryService : ICategoryService
 
         if (category is null)
         {
-            throw new NotFoundException("Kategori Bulunamadı");
+            //throw new NotFoundException("Kategori Bulunamadı");
         }
 
         var normalizedName = request.Name.Trim().ToLower();
@@ -78,7 +78,7 @@ public class CategoryService : ICategoryService
 
         if (category is null)
         {
-            throw new NotFoundException("Kategori Bulunamadı");
+           // throw new NotFoundException("Kategori Bulunamadı");
         }
 
         _categoryRepository.Delete(category);
@@ -97,7 +97,7 @@ public class CategoryService : ICategoryService
 
         if (categories is null || categories.Count == 0)
         {
-            throw new NotFoundException("Categoriler Listesi Bulunamadı");
+            //throw new NotFoundException("Categoriler Listesi Bulunamadı");
         }
 
         return ServiceResult.ServiceResult<List<CategoryDto>>.Success(categories);
@@ -115,15 +115,13 @@ public class CategoryService : ICategoryService
         var categoryDto = new CategoryWithProductsDto(
             category.Id,
             category.Name,
-            category.ProductList is null
-                ? new List<ProductDto>()
-                : category.ProductList.Select(p => new ProductDto(
-                    p.Id,
-                    p.Name,
-                    p.Price,
-                    p.Count,
-                    p.CategoryId
-                )).ToList()
+            category.ProductList.Select(p => new ProductDto(
+                p.Id,
+                p.Name,
+                p.Price,
+                p.Count,
+                p.CategoryId
+            )).ToList()
         );
 
         return ServiceResult.ServiceResult<CategoryWithProductsDto>.Success(categoryDto);
@@ -139,15 +137,13 @@ public class CategoryService : ICategoryService
         var result = categories.Select(category => new CategoryWithProductsDto(
             category.Id,
             category.Name,
-            category.ProductList is null
-                ? new List<ProductDto>()
-                : category.ProductList.Select(p => new ProductDto(
-                    p.Id,
-                    p.Name,
-                    p.Price,
-                    p.Count,
-                    p.CategoryId
-                )).ToList()
+            category.ProductList.Select(p => new ProductDto(
+                p.Id,
+                p.Name,
+                p.Price,
+                p.Count,
+                p.CategoryId
+            )).ToList()
         )).ToList();
 
         return ServiceResult.ServiceResult<List<CategoryWithProductsDto>>.Success(result);

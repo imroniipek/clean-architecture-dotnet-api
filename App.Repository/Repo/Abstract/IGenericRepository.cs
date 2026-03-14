@@ -13,6 +13,4 @@ public interface IGenericRepository<T,T1> where T:class where T1:struct
     void Update(T entity);
 
     void Delete(T entity);
-
-
 }

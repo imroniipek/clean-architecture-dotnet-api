@@ -9,12 +9,14 @@ public class ProductConfiguration:IEntityTypeConfiguration<Product>
     {
         builder.HasKey(x => x.Id);
 
+        //Kolonun özellikleri boş bırakılabilir mi max uzunlugu,null olabilir mi vs ayarlamamızı sağlar.
         builder.Property(x => x.Name).IsRequired().HasMaxLength(150);
 
+        //Mevcut sütun üzerinde "hızlı erişim yolu" kurar.Sorgu hızı (Performance) ve Kısıtlama sağlar/
+        builder.HasIndex(x => x.Name).IsUnique();
+            
         builder.Property(x => x.Price).IsRequired().HasColumnType("decimal(18,2)");
 
         builder.Property(x => x.Count).IsRequired();
-
-
     }
 }

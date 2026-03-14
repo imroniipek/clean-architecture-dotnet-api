@@ -4,5 +4,7 @@ namespace App.Services.Exceptions;
 
 public class GlobalException:AppException
 {
-    public GlobalException(string message) : base(HttpStatusCode.BadGateway, message) {}
+    public GlobalException(HttpStatusCode statuscode, string message) : base(statuscode, message)
+    {}
+    
 }

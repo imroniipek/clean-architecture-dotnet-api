@@ -28,7 +28,6 @@ public class GenericRepository<T, T1>(AppDbContext context)
     {
          await DbSet.AddAsync(entity);
     }
-
     public void Update(T entity)=>  DbSet.Update(entity);
     
 

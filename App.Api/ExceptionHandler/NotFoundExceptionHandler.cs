@@ -14,11 +14,15 @@ public class NotFoundExceptionHandler : IExceptionHandler
         {
             var result = App.Services.ServiceResult.ServiceResult.Failed(
                 notFoundException.StatusCode,
-                new[] { notFoundException.Message }
+                new string[] { notFoundException.Message }
             );
-           
+             httpContext.Response.StatusCode = Convert.ToInt32(notFoundException.StatusCode);
             await httpContext.Response.WriteAsJsonAsync(result, cancellationToken);
 
+            var path = httpContext.Request.Path;
+
+            var query = httpContext.Request.Query;
+            
             return true;
         }
         

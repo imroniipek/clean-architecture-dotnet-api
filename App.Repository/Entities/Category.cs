@@ -6,7 +6,7 @@ public class Category:IBaseEntity<int>,IAudiEntity
 
     public string Name { set; get; } = default!;
 
-    public List<Product>? ProductList { get; set; }
+    public List<Product> ProductList { get; init; } = new List<Product>();
 
     public DateTime CreatedAt { get; set; }
     
