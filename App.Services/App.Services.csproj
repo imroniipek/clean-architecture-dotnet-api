@@ -10,4 +10,10 @@
       <ProjectReference Include="..\App.Repository\App.Repository.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="System.Configuration.ConfigurationManager">
+        <HintPath>..\App.Api\bin\Debug\net8.0\System.Configuration.ConfigurationManager.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

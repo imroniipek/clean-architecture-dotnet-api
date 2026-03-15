@@ -69,8 +69,8 @@ public class ProductService : IProductService
             .ToListAsync();
 
         /*if (!products.Any())
-            throw new NotFoundException("Ürünler bulunamadı");
-                     */
+            throw new NotFoundException("Product");*/
+                     
         var dtoList = products
             .Select(p => new ProductDto(p.Id, p.Name, p.Price, p.Count, p.CategoryId))
             .ToList();
@@ -137,7 +137,7 @@ public class ProductService : IProductService
             .AnyAsync(x => x.Name.ToLower() == normalizedName);
 
         if (exists)
-            return ServiceResult<ProductCreateResponse>.Failed(new[] { "Db'de bu ürün bulunmaktadır" });
+            throw new ConflictException("Bu üründen db'de zaten bulunmaktadır");
 
         var product = new Repository.Entities.Product
         {

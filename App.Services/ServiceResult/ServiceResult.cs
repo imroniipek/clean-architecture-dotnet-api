@@ -64,4 +64,5 @@ public class ServiceResult
             StatusCode = statusCode,
             ErrorMessages = errorList
         };
+    
 }

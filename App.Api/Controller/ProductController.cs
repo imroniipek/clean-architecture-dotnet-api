@@ -16,6 +16,7 @@ public class ProductController(IProductService service):CustomBaseController
     
     
     [HttpGet("{id:int}")]
+    [ServiceFilter(typeof(CheckFilter))]
     public async Task<IActionResult> GetById(int id)
         => CreateActionResult(await service.GetProductByIdAsync(id));
 
