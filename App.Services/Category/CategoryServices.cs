@@ -6,7 +6,6 @@ using App.Services.Category.Update;
 using App.Services.Dto;
 using App.Services.Exceptions;
 using Microsoft.EntityFrameworkCore;
-
 namespace App.Services.Category;
 
 public class CategoryService : ICategoryService
@@ -50,7 +49,7 @@ public class CategoryService : ICategoryService
 
         if (category is null)
         {
-            //throw new NotFoundException("Kategori Bulunamadı");
+            throw new NotFoundException("Category",request.Id);
         }
 
         var normalizedName = request.Name.Trim().ToLower();
@@ -67,6 +66,7 @@ public class CategoryService : ICategoryService
         category.Name = request.Name.Trim();
 
         _categoryRepository.Update(category);
+
         await _unitOfWork.SaveAllChangesInDbAsync();
 
         return ServiceResult.ServiceResult.Success(HttpStatusCode.NoContent);
@@ -78,7 +78,7 @@ public class CategoryService : ICategoryService
 
         if (category is null)
         {
-           // throw new NotFoundException("Kategori Bulunamadı");
+           throw new NotFoundException("Kategori Bulunamadı",id);
         }
 
         _categoryRepository.Delete(category);
@@ -95,7 +95,7 @@ public class CategoryService : ICategoryService
             .Select(x => new CategoryDto(x.Id, x.Name))
             .ToListAsync();
 
-        if (categories is null || categories.Count == 0)
+        if (categories.Count == 0)
         {
             //throw new NotFoundException("Categoriler Listesi Bulunamadı");
         }
@@ -112,17 +112,7 @@ public class CategoryService : ICategoryService
             return ServiceResult.ServiceResult<CategoryWithProductsDto>.Failed(new[] { "Kategori bulunamadı." });
         }
 
-        var categoryDto = new CategoryWithProductsDto(
-            category.Id,
-            category.Name,
-            category.ProductList.Select(p => new ProductDto(
-                p.Id,
-                p.Name,
-                p.Price,
-                p.Count,
-                p.CategoryId
-            )).ToList()
-        );
+        var categoryDto = new CategoryWithProductsDto(category.Id, category.Name, category.ProductList.Select(p => new ProductDto(p.Id, p.Name, p.Price, p.Count, p.CategoryId)).ToList());
 
         return ServiceResult.ServiceResult<CategoryWithProductsDto>.Success(categoryDto);
     }
@@ -137,15 +127,7 @@ public class CategoryService : ICategoryService
         var result = categories.Select(category => new CategoryWithProductsDto(
             category.Id,
             category.Name,
-            category.ProductList.Select(p => new ProductDto(
-                p.Id,
-                p.Name,
-                p.Price,
-                p.Count,
-                p.CategoryId
-            )).ToList()
-        )).ToList();
-
+            category.ProductList.Select(p => new ProductDto(p.Id, p.Name, p.Price, p.Count, p.CategoryId)).ToList())).ToList();
         return ServiceResult.ServiceResult<List<CategoryWithProductsDto>>.Success(result);
     }
 
